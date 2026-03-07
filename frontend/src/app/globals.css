@@ -1,0 +1,1630 @@
+/* ═══════════════════════════════════════════════════════
+   VERITAS — Case File System
+   Art Direction: Serious Detective / Police Report
+   Palette: Off-white, Charcoal, Blood Red, Warning Yellow
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Reset ─────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Design Tokens ─────────────────────────────────── */
+:root {
+  /* Colors */
+  --paper: #f2f0e9;
+  --paper-dark: #e8e4d9;
+  --paper-yellow: #f5f0d0;
+  --charcoal: #1a1a1a;
+  --ink: #2d2d2d;
+  --ink-light: #555;
+  --red: #8b1a1a;
+  --red-bright: #c41e1e;
+  --yellow-warn: #b8860b;
+  --stamp-bg: #1a1a1a;
+  --evidence-tag: #2d4a1a;
+  --border: #1a1a1a;
+  --border-light: #999;
+  --border-dashed: #888;
+
+  /* Typography */
+  --font-mono: 'Space Mono', 'Courier New', monospace;
+  --font-body: 'Inter', 'Helvetica Neue', sans-serif;
+
+  /* Spacing */
+  --gap: 16px;
+}
+
+/* ── Body — Old paper with grain ───────────────────── */
+html,
+body {
+  background-color: var(--paper);
+  color: var(--charcoal);
+  font-family: var(--font-body);
+  line-height: 1.55;
+  min-height: 100vh;
+  /* Grain texture overlay */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* ── Scrollbar — minimal ───────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--paper-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+}
+
+/* ── Utilities ─────────────────────────────────────── */
+.font-mono {
+  font-family: var(--font-mono) !important;
+}
+
+.font-body {
+  font-family: var(--font-body) !important;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.text-red {
+  color: var(--red);
+}
+
+.text-red-bright {
+  color: var(--red-bright);
+}
+
+.text-ink {
+  color: var(--ink);
+}
+
+.text-ink-light {
+  color: var(--ink-light);
+}
+
+.text-yellow {
+  color: var(--yellow-warn);
+}
+
+.border-black {
+  border-color: var(--border);
+}
+
+.border-dashed {
+  border-style: dashed;
+}
+
+.bg-paper {
+  background: var(--paper);
+}
+
+.bg-paper-dark {
+  background: var(--paper-dark);
+}
+
+.bg-paper-yellow {
+  background: var(--paper-yellow);
+}
+
+.bg-stamp {
+  background: var(--stamp-bg);
+  color: #fff;
+}
+
+/* ── Animations ────────────────────────────────────── */
+@keyframes stampIn {
+  0% {
+    opacity: 0;
+    transform: scale(2) rotate(-15deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(0.9) rotate(-4deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-5deg);
+  }
+}
+
+.animate-stamp-in {
+  animation: stampIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* ── React Flow Custom Node Effects ────────────────── */
+.torn-paper {
+  background: #f2f0e9;
+  filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.2));
+  clip-path: polygon(0% 2%, 5% 0%, 10% 3%, 15% 1%, 20% 4%, 25% 1%, 30% 3%, 35% 2%, 40% 5%, 45% 2%,
+      50% 4%, 55% 1%, 60% 4%, 65% 2%, 70% 5%, 75% 2%, 80% 4%, 85% 2%, 90% 5%, 95% 1%, 100% 3%,
+      98% 100%, 0% 98%);
+  border: 1px solid #000;
+}
+
+.noir-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  pointer-events: none;
+}
+
+/* ── Cinematic Effects ───────────────────────────── */
+.vignette-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.4) 150%);
+  z-index: 9998;
+}
+
+.crt-scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 4px, 6px 100%;
+  z-index: 9999;
+  opacity: 0.6;
+}
+
+/* ── React Flow Red Thread Edge ───────────────────────────── */
+.react-flow__edge-path {
+  stroke: #b91c1c !important;
+  /* Đỏ Noir */
+  stroke-width: 3px !important;
+  stroke-dasharray: 5, 5;
+  filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+.react-flow__connection-path {
+  stroke: #b91c1c !important;
+  stroke-width: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CRIMINAL MODE — BLUEPRINT ROOM
+   Technical Noir: Black / Crimson Neon
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Blueprint Grid Canvas ──────────────────────────────── */
+.blueprint-grid {
+  background-color: #050505;
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(185, 28, 28, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(185, 28, 28, 0.08) 1px, transparent 1px);
+}
+
+/* Large grid overlay */
+.blueprint-grid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-size: 200px 200px;
+  background-image:
+    linear-gradient(to right, rgba(185, 28, 28, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(185, 28, 28, 0.15) 1px, transparent 1px);
+  z-index: 0;
+}
+
+/* ── Neon Edge Glow (Blueprint mode override) ─────────────── */
+.blueprint-mode .react-flow__edge-path {
+  stroke: #ff2020 !important;
+  stroke-width: 2px !important;
+  stroke-dasharray: none !important;
+  filter: drop-shadow(0 0 4px rgba(255, 32, 32, 0.9)) drop-shadow(0 0 10px rgba(255, 32, 32, 0.4)) !important;
+}
+
+.blueprint-mode .react-flow__connection-path {
+  stroke: #ff2020 !important;
+  stroke-width: 2px !important;
+  filter: drop-shadow(0 0 6px rgba(255, 32, 32, 0.8)) !important;
+}
+
+.blueprint-mode .react-flow__handle {
+  background: #ff2020 !important;
+  border: none !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 0 !important;
+}
+
+.blueprint-mode .react-flow__handle:hover {
+  box-shadow: 0 0 0 4px rgba(255, 32, 32, 0.3) !important;
+}
+
+/* ── Crosshair Cursor ─────────────────────────────────────── */
+.blueprint-cursor,
+.blueprint-cursor * {
+  cursor: crosshair !important;
+}
+
+/* ── "TOP SECRET" watermark ──────────────────────────────── */
+.blueprint-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.blueprint-watermark span {
+  font-family: var(--font-mono);
+  font-size: clamp(80px, 14vw, 200px);
+  font-weight: 900;
+  color: rgba(185, 28, 28, 0.04);
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: -0.05em;
+  user-select: none;
+  transform: rotate(-10deg);
+}
+
+/* ── Glitch Animation ─────────────────────────────────────── */
+@keyframes glitch-flash {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+    filter: brightness(1);
+  }
+
+  10% {
+    opacity: 0.9;
+    transform: translate(-3px, 0);
+    filter: brightness(1.5) saturate(2) hue-rotate(10deg);
+  }
+
+  20% {
+    opacity: 1;
+    transform: translate(3px, 1px);
+    filter: brightness(0.8);
+  }
+
+  30% {
+    opacity: 0.95;
+    transform: translate(-2px, -1px);
+    filter: brightness(1.3);
+  }
+
+  40% {
+    clip-path: inset(40% 0 20% 0);
+    transform: translate(4px, 0);
+  }
+
+  50% {
+    clip-path: inset(0);
+    transform: translate(0, 0);
+    filter: brightness(1);
+  }
+
+  60% {
+    opacity: 0.9;
+    transform: translate(-1px, 0);
+  }
+
+  70% {
+    clip-path: inset(60% 0 10% 0);
+    transform: translate(2px, 0);
+    filter: brightness(1.4);
+  }
+
+  80% {
+    clip-path: inset(0);
+    transform: translate(0, 0);
+  }
+
+  90% {
+    opacity: 0.95;
+    transform: translate(1px, -1px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(0, 0);
+    filter: brightness(1);
+  }
+}
+
+.glitch-active {
+  animation: glitch-flash 0.45s steps(1) forwards;
+}
+
+/* ── Neon Input Fields ────────────────────────────────────── */
+.blueprint-input {
+  background: rgba(185, 28, 28, 0.05);
+  border: none;
+  border-bottom: 1px solid rgba(255, 32, 32, 0.25);
+  color: #f2f2f2;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 6px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+
+.blueprint-input:focus {
+  border-bottom-color: #ff2020;
+  background: rgba(255, 32, 32, 0.07);
+}
+
+.blueprint-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+  font-style: italic;
+}
+
+/* ── Draggable Asset Cards ────────────────────────────────── */
+.asset-card {
+  border: 1px solid rgba(185, 28, 28, 0.3);
+  background: rgba(185, 28, 28, 0.04);
+  padding: 10px 14px;
+  cursor: grab;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.asset-card:hover {
+  background: rgba(185, 28, 28, 0.1);
+  border-color: rgba(255, 32, 32, 0.5);
+  box-shadow: 0 0 12px rgba(255, 32, 32, 0.15);
+}
+
+.asset-card:active {
+  cursor: grabbing;
+  box-shadow: 0 0 20px rgba(255, 32, 32, 0.3);
+  border-color: #ff2020;
+}
+
+/* ── Dark Scrollbar (for sidebar) ────────────────────────── */
+.blueprint-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.blueprint-scroll::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+.blueprint-scroll::-webkit-scrollbar-thumb {
+  background: rgba(185, 28, 28, 0.4);
+}
+
+/* ── Node glow pulse (culprit) ───────────────────────────── */
+@keyframes culprit-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.4), 0 0 20px rgba(255, 0, 0, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 18px rgba(255, 0, 0, 0.7), 0 0 40px rgba(255, 0, 0, 0.2);
+  }
+}
+
+.culprit-glow {
+  animation: culprit-pulse 2s ease-in-out infinite;
+}
+
+/* ── Blueprint React Flow background ─────────────────────── */
+.blueprint-mode .react-flow__background {
+  background-color: #050505 !important;
+}
+
+.blueprint-mode .react-flow__minimap {
+  background: #0a0a0a !important;
+  border: 1px solid rgba(185, 28, 28, 0.3) !important;
+  border-radius: 0 !important;
+}
+
+.blueprint-mode .react-flow__controls {
+  border: 1px solid rgba(185, 28, 28, 0.3) !important;
+  border-radius: 0 !important;
+  background: #0a0a0a !important;
+  box-shadow: none !important;
+}
+
+.blueprint-mode .react-flow__controls-button {
+  background: #0a0a0a !important;
+  border-bottom: 1px solid rgba(185, 28, 28, 0.2) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.blueprint-mode .react-flow__controls-button:hover {
+  background: rgba(185, 28, 28, 0.1) !important;
+  color: #ff2020 !important;
+}
+
+.blueprint-mode .react-flow__controls-button svg {
+  fill: currentColor !important;
+}
+
+/* ── HEIST PUBLISHED — Victory Stamp ────────────────────────── */
+@keyframes stamp-drop {
+  0% {
+    transform: scale(4) rotate(-5deg);
+    opacity: 0;
+  }
+
+  40% {
+    transform: scale(0.92) rotate(-3deg);
+    opacity: 1;
+  }
+
+  55% {
+    transform: scale(1.06) rotate(-3.5deg);
+  }
+
+  70% {
+    transform: scale(0.97) rotate(-3deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(-3deg);
+    opacity: 1;
+  }
+}
+
+@keyframes stamp-glow-pulse {
+
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.6), 0 0 80px rgba(255, 0, 0, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 60px rgba(255, 0, 0, 0.9), 0 0 120px rgba(255, 0, 0, 0.4);
+  }
+}
+
+@keyframes screen-flash {
+  0% {
+    background: rgba(255, 0, 0, 0);
+  }
+
+  15% {
+    background: rgba(255, 0, 0, 0.15);
+  }
+
+  30% {
+    background: rgba(255, 0, 0, 0);
+  }
+
+  45% {
+    background: rgba(255, 0, 0, 0.08);
+  }
+
+  100% {
+    background: rgba(0, 0, 0, 0.85);
+  }
+}
+
+.publish-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: screen-flash 0.5s ease-out forwards;
+  backdrop-filter: blur(2px);
+}
+
+.publish-stamp {
+  border: 6px solid #ff2020;
+  padding: 24px 48px;
+  text-align: center;
+  animation: stamp-drop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s both,
+    stamp-glow-pulse 1.5s ease-in-out 0.7s infinite;
+  background: rgba(5, 5, 5, 0.95);
+}
+
+.publish-stamp-text {
+  font-family: var(--font-mono);
+  font-size: clamp(28px, 5vw, 60px);
+  font-weight: 900;
+  color: #ff2020;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
+  line-height: 1;
+}
+
+.publish-stamp-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  display: block;
+  margin-top: 10px;
+}
+
+/* ── Self-Solve Overlay ───────────────────────────────────────── */
+.self-solve-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(2, 2, 2, 0.97);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.self-solve-header {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(255, 32, 32, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  border: 1px solid rgba(255, 32, 32, 0.2);
+  padding: 8px 24px;
+}
+
+.self-solve-title {
+  font-family: var(--font-mono);
+  font-weight: 900;
+  font-size: clamp(20px, 3vw, 36px);
+  color: #f2f2f2;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.self-solve-subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  max-width: 400px;
+  line-height: 1.8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.suspect-accusation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  max-width: 700px;
+  width: 100%;
+  padding: 0 24px;
+}
+
+.suspect-accusation-card {
+  border: 1px solid rgba(185, 28, 28, 0.3);
+  padding: 16px;
+  cursor: pointer;
+  background: rgba(5, 5, 5, 0.8);
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.suspect-accusation-card:hover {
+  border-color: rgba(255, 32, 32, 0.7);
+  background: rgba(255, 32, 32, 0.06);
+  box-shadow: 0 0 20px rgba(255, 32, 32, 0.15);
+}
+
+.suspect-accusation-card.accused {
+  border-color: #ff2020;
+  background: rgba(255, 32, 32, 0.12);
+  box-shadow: 0 0 30px rgba(255, 32, 32, 0.3);
+}
+
+.suspect-accusation-card .card-id {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: rgba(255, 32, 32, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+
+.suspect-accusation-card .card-name {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 900;
+  color: #f2f2f2;
+  text-transform: uppercase;
+}
+
+.suspect-accusation-card .card-bio {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1.5;
+}
+
+/* ── 3D Flip Card Utilities ────────────────────────────────── */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* ── DOSSIER PROFILE CSS ────────────────────────────────────── */
+.dossier-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #050505;
+  position: relative;
+}
+
+.dossier-loading {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  color: var(--charcoal);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.dossier-back-btn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.dossier-back-btn:hover {
+  color: var(--paper);
+}
+
+.dossier-helper {
+  margin-bottom: 32px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #555;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  animation: dossier-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes dossier-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.dossier-card-container {
+  width: 380px;
+  height: 580px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.dossier-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s;
+  transform-style: preserve-3d;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.dossier-card-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+/* Front: THE LAW */
+.dossier-front {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  background: var(--paper);
+  border: 6px solid var(--charcoal);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.1);
+}
+
+.dossier-header {
+  border-bottom: 3px solid var(--charcoal);
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.dossier-header-title h2 {
+  font-family: var(--font-mono);
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--charcoal);
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.dossier-badge {
+  width: 48px;
+  height: 48px;
+  background: var(--evidence-tag);
+  border: 2px solid var(--charcoal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dossier-badge-star {
+  color: var(--paper);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+}
+
+.dossier-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.dossier-photo {
+  width: 128px;
+  height: 160px;
+  background: #d4d0c5;
+  border: 3px solid var(--charcoal);
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+
+.dossier-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.1) brightness(0.9);
+  display: block;
+}
+
+.dossier-photo-text {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--charcoal);
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+  text-align: center;
+}
+
+.dossier-info {
+  text-align: center;
+  width: 100%;
+}
+
+.dossier-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-light);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 4px;
+}
+
+.dossier-name {
+  font-size: 30px;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  color: var(--charcoal);
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.dossier-rank {
+  color: var(--evidence-tag);
+  font-family: var(--font-mono);
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  font-size: 14px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border: 1px solid var(--evidence-tag);
+  display: inline-block;
+  background: rgba(45, 74, 26, 0.05);
+}
+
+.dossier-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  border-top: 3px solid var(--charcoal);
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+.dossier-stat-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.dossier-stat-val {
+  font-family: var(--font-mono);
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--charcoal);
+}
+
+.dossier-signature {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dossier-sig-box {
+  text-align: right;
+}
+
+.dossier-sig-text {
+  font-family: 'Dancing Script', cursive;
+  font-size: 24px;
+  color: var(--charcoal);
+  opacity: 0.8;
+  transform: rotate(-5deg);
+}
+
+.dossier-sig-line {
+  border-top: 1px solid var(--charcoal);
+  width: 128px;
+  margin-top: 4px;
+}
+
+.dossier-sig-title {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--ink-light);
+  margin-top: 4px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Back: THE CRIME */
+.dossier-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+  background: #0a0a0a;
+  color: #f2f2f2;
+  border: 6px solid #8b1a1a;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: inset 0 0 100px rgba(139, 26, 26, 0.15);
+  overflow: hidden;
+}
+
+.dossier-crime-header {
+  background: #8b1a1a;
+  padding: 12px;
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+  border-bottom: 4px solid #500f0f;
+}
+
+.dossier-crime-header h2 {
+  font-weight: 900;
+  font-size: 30px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  color: var(--paper);
+}
+
+.dossier-crime-photo {
+  width: 128px;
+  height: 160px;
+  background: #121212;
+  border: 2px solid #8b1a1a;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dossier-crime-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: #8b1a1a;
+  opacity: 0.1;
+}
+
+.dossier-crime-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.2) brightness(0.8) sepia(0.2);
+  display: block;
+  mix-blend-mode: luminosity;
+}
+
+.dossier-crime-photo-text {
+  color: #8b1a1a;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  font-size: 30px;
+  transform: rotate(-12deg);
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+  mix-blend-mode: screen;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 1);
+  padding: 0 8px;
+  text-align: center;
+}
+
+.dossier-crime-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #8b1a1a;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 4px;
+}
+
+.dossier-crime-name {
+  font-size: 30px;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  color: #f2f2f2;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 8px;
+  text-shadow: 0 0 10px rgba(139, 26, 26, 0.8);
+}
+
+.dossier-crime-sub {
+  color: #f2f2f2;
+  opacity: 0.5;
+  font-family: var(--font-mono);
+  font-style: italic;
+  font-size: 12px;
+  margin-top: 8px;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.dossier-crime-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  border-top: 3px solid #8b1a1a;
+  padding-top: 16px;
+  margin-top: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.dossier-crime-stat-val {
+  font-family: var(--font-mono);
+  font-weight: 900;
+  font-size: 20px;
+  color: #f2f2f2;
+}
+
+.dossier-fooled-box {
+  margin-top: 16px;
+  background: rgba(139, 26, 26, 0.1);
+  border: 1px solid #8b1a1a;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.dossier-fooled-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #f2f2f2;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.dossier-fooled-val {
+  font-family: var(--font-mono);
+  font-weight: 900;
+  font-size: 18px;
+  color: #8b1a1a;
+}
+
+/* ── HALL OF RECORDS CSS ─────────────────────────────────────── */
+.hall-of-records-page {
+  min-height: 100vh;
+  background-color: var(--paper-dark);
+  padding: 32px;
+  font-family: var(--font-mono);
+  color: var(--charcoal);
+  position: relative;
+}
+
+/* Background texture to look like a corkboard/bulletin board or dirty paper */
+.hall-of-records-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.records-header {
+  text-align: center;
+  margin-bottom: 48px;
+  position: relative;
+  z-index: 10;
+}
+
+.records-title {
+  font-family: var(--font-body);
+  font-size: 48px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
+}
+
+.records-subtitle {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ink-light);
+}
+
+.records-header-line {
+  margin: 16px auto 0;
+  width: 60%;
+  max-width: 600px;
+  border-bottom: 3px solid var(--charcoal);
+}
+
+.records-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+@media (min-width: 768px) {
+  .records-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.records-section {
+  padding: 24px;
+}
+
+.records-section-header {
+  border-bottom: 4px solid;
+  padding-bottom: 8px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.records-section-header h2 {
+  font-size: 24px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: var(--font-body);
+}
+
+.records-label {
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* THE LAW SPECIFIC */
+.law-section {
+  background: var(--paper);
+  border: 2px solid var(--charcoal);
+  box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+}
+
+.law-header {
+  border-color: #1e3a8a;
+  /* blue-900 equivalent */
+}
+
+.law-header h2 {
+  color: var(--paper);
+  background: #1e3a8a;
+  padding: 4px 12px;
+}
+
+.law-card {
+  background: #ffffff;
+  border: 2px solid #1e3a8a;
+  box-shadow: 4px 4px 0px 0px #1e3a8a;
+}
+
+.law-rank {
+  background: #1e3a8a;
+  color: #fff;
+}
+
+.law-score {
+  color: #1e3a8a;
+}
+
+/* CRIME SPECIFIC */
+.crime-section {
+  background: #18181b;
+  /* zinc-900 equivalent */
+  border: 2px solid var(--red-bright);
+  box-shadow: 8px 8px 0px 0px rgba(153, 27, 27, 1);
+  /* red-800 equivalent */
+  color: var(--paper);
+}
+
+.crime-header {
+  border-color: var(--red);
+}
+
+.crime-header h2 {
+  color: var(--paper);
+  background: var(--red);
+  padding: 4px 12px;
+}
+
+.crime-card {
+  background: rgba(139, 26, 26, 0.05);
+  /* very faint red tint */
+  border: 2px solid var(--red);
+  box-shadow: 4px 4px 0px 0px var(--red);
+  color: var(--paper);
+}
+
+.crime-rank {
+  background: var(--red);
+  color: #fff;
+}
+
+.crime-score {
+  color: var(--red-bright);
+}
+
+.records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.record-card {
+  position: relative;
+  padding: 16px 16px 16px 56px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.record-rank {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.record-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.record-name {
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.record-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.7;
+}
+
+.record-stats {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+}
+
+.record-score {
+  font-size: 20px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.record-sub-stats {
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.records-empty {
+  text-align: center;
+  font-style: italic;
+  opacity: 0.5;
+  padding: 32px 0;
+}
+
+.wanted-stamp {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-12deg);
+  border: 2px solid var(--red-bright);
+  color: var(--red-bright);
+  font-weight: bold;
+  font-size: 12px;
+  padding: 4px;
+  opacity: 0.6;
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════════════════════════════
+   CRIME SCENE LOG (CORKBOARD & STICKY NOTES)
+   ══════════════════════════════════════════════════════════ */
+
+.corkboard-container {
+  margin-top: 48px;
+  background-color: #8b6b4a;
+  /* Wooden/cork frame color */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+  border: 12px solid #3e2723;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.3);
+  padding: 32px;
+  min-height: 400px;
+  position: relative;
+  font-family: var(--font-mono);
+}
+
+.corkboard-header {
+  text-align: center;
+  margin-bottom: 32px;
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.3);
+  padding-bottom: 16px;
+}
+
+.corkboard-header h2 {
+  font-family: var(--font-body);
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.corkboard-subtitle {
+  font-size: 12px;
+  color: #d1bfae;
+  letter-spacing: 0.3em;
+}
+
+.corkboard-loading {
+  text-align: center;
+  font-family: var(--font-mono);
+  color: var(--ink-light);
+  padding: 40px;
+  letter-spacing: 0.2em;
+}
+
+.corkboard-restricted {
+  margin-top: 48px;
+  text-align: center;
+  padding: 64px 24px;
+  border: 2px dashed var(--red-bright);
+  background: var(--paper-dark);
+  color: var(--charcoal);
+  font-family: var(--font-mono);
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+
+.corkboard-restricted .restricted-icon {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 16px;
+  color: var(--red-bright);
+}
+
+.corkboard-empty {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+  font-size: 14px;
+  grid-column: 1 / -1;
+  padding: 40px;
+}
+
+.corkboard-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+  margin-bottom: 48px;
+}
+
+/* Base Sticky Note */
+.sticky-note {
+  position: relative;
+  padding: 20px 24px 24px;
+  width: 100%;
+  box-shadow: 4px 6px 10px rgba(0, 0, 0, 0.4);
+  background: #f2f0e9;
+  font-family: 'Courier New', Courier, monospace;
+  color: #1a1a1a;
+  transition: transform 0.2s, box-shadow 0.2s;
+  min-height: 150px;
+}
+
+.sticky-note:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 8px 12px 20px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.note-pin {
+  width: 12px;
+  height: 12px;
+  background-color: #c0392b;
+  border-radius: 50%;
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.5), 1px 2px 2px rgba(0, 0, 0, 0.4);
+}
+
+.note-pin::after {
+  content: '';
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+}
+
+.note-header {
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.3);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  margin-top: 8px;
+}
+
+.note-author-name {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.note-time {
+  opacity: 0.6;
+}
+
+.note-content {
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.note-footer {
+  margin-top: 16px;
+  font-size: 10px;
+  text-align: right;
+  border-top: 1px dotted rgba(0, 0, 0, 0.3);
+  padding-top: 8px;
+}
+
+.note-stamp {
+  position: absolute;
+  top: 12px;
+  right: -10px;
+  font-weight: 900;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  border: 2px solid;
+  transform: rotate(15deg);
+  pointer-events: none;
+  opacity: 0.8;
+  font-family: var(--font-body);
+}
+
+/* Failed (Victim) */
+.note-failed {
+  background-color: #fdf6e3;
+  /* Slightly yellow */
+}
+
+.stamp-victim {
+  color: #b8860b;
+  border-color: #b8860b;
+}
+
+/* Solved (Verified) */
+.note-solved {
+  background: #f2f0e9;
+}
+
+.stamp-verified {
+  color: #2d4a1a;
+  border-color: #2d4a1a;
+}
+
+/* Author (Mastermind) */
+.note-author {
+  background-color: #1a1a1a;
+  color: #f2f0e9;
+}
+
+.note-author .note-header,
+.note-author .note-footer {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.note-author .note-pin {
+  background-color: #e0e0e0;
+  /* Silver pin */
+}
+
+.stamp-mastermind {
+  color: #ff2020;
+  border-color: #ff2020;
+  text-shadow: 0 0 5px rgba(255, 32, 32, 0.8);
+}
+
+/* Input Form */
+.corkboard-form {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.corkboard-form textarea {
+  width: 100%;
+  height: 80px;
+  background: #f2f0e9;
+  border: 2px solid #1a1a1a;
+  padding: 12px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  resize: vertical;
+  color: #1a1a1a;
+}
+
+.corkboard-form textarea:focus {
+  outline: none;
+  border-color: #b91c1c;
+}
+
+.corkboard-form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.corkboard-form-actions .char-count {
+  color: #d1bfae;
+  font-size: 12px;
+}
+
+.corkboard-form button {
+  background: #1a1a1a;
+  color: #f2f0e9;
+  border: 2px solid #1a1a1a;
+  padding: 8px 16px;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  transition: background 0.2s, color 0.2s;
+}
+
+.corkboard-form button:hover:not(:disabled) {
+  background: #b91c1c;
+  color: #fff;
+  border-color: #b91c1c;
+}
+
+.corkboard-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
