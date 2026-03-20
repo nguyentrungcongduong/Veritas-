@@ -1,6 +1,6 @@
 FROM php:8.3-apache
 
-# Cài đặt các thư viện hệ thống
+# Cài đặt các thư viện hệ thống cần thiết
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,10 +10,14 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libpq-dev \
+    libzip-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Cài đặt PHP extensions (Quan trọng nhất là pdo_pgsql)
-RUN docker-php-ext-install pdo_pgsql pgsql mbstring zip exif pcntl bcmath gd
+# Cấu hình và cài đặt PHP extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_pgsql pgsql mbstring zip exif pcntl bcmath gd
 
 # Kích hoạt mod_rewrite của Apache
 RUN a2enmod rewrite
