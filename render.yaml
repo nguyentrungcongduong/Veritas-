@@ -1,8 +1,8 @@
 services:
   - type: web
     name: veritas-backend
-    env: docker # Dùng Docker vì Native PHP đang bị lỗi "invalid runtime"
-    plan: free # Phải để plan: free thì mới không tốn tiền
+    env: docker
+    plan: free
     dockerContext: backend
     dockerfilePath: backend/Dockerfile.render
     envVars:
@@ -10,9 +10,11 @@ services:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: false
+        value: true # Bật lên để xem lỗi 500 là gì
       - key: DB_CONNECTION
         value: pgsql
+      - key: DB_SSLMODE
+        value: require # Bắt buộc phải có cái này cho Neon
       - key: CORS_ALLOWED_ORIGINS
         value: "*"
 
@@ -30,7 +32,7 @@ envVarGroups:
       - key: DB_PASSWORD
         sync: false
       - key: APP_KEY
-        generateValue: true
+        sync: false # Bạn điền tay cái base64 tui gửi vào Dashboard nhé
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
