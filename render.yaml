@@ -1,11 +1,10 @@
 services:
   - type: web
     name: veritas-backend
-    env: php
-    plan: free # Quan trọng để không tốn tiền
-    rootDir: backend
-    buildCommand: "composer install --no-dev --optimize-autoloader && php artisan migrate --force"
-    startCommand: "apache2-foreground" # Lệnh chạy mặc định của Render PHP
+    env: docker # Dùng Docker vì Native PHP đang bị lỗi "invalid runtime"
+    plan: free # Phải để plan: free thì mới không tốn tiền
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile.render
     envVars:
       - fromGroup: veritas-shared-secrets
       - key: APP_ENV
@@ -14,8 +13,6 @@ services:
         value: false
       - key: DB_CONNECTION
         value: pgsql
-      - key: DOCUMENT_ROOT
-        value: public # Chỉ định Laravel public folder
       - key: CORS_ALLOWED_ORIGINS
         value: "*"
 
@@ -37,4 +34,4 @@ envVarGroups:
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
-        value: sync # Chuyển về sync vì không có Worker ở gói Free
+        value: sync
