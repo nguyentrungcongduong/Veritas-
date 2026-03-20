@@ -2,9 +2,9 @@ services:
   # 1. Backend Service (Laravel)
   - type: web
     name: veritas-backend
-    env: docker # Standard key
+    env: docker
     dockerContext: backend
-    dockerfilePath: backend/Dockerfile.render # Relative to repo root
+    dockerfilePath: backend/Dockerfile.render
     envVars:
       - fromGroup: veritas-shared-secrets
       - key: APP_ENV
@@ -19,9 +19,9 @@ services:
   # 2. Worker Service (Queues)
   - type: worker
     name: veritas-worker
-    env: docker # Standard key
+    env: docker
     dockerContext: backend
-    dockerfilePath: backend/Dockerfile.render # Relative to repo root
+    dockerfilePath: backend/Dockerfile.render
     dockerCommand: "php artisan queue:work --tries=3"
     envVars:
       - fromGroup: veritas-shared-secrets
@@ -30,7 +30,7 @@ services:
       - key: DB_CONNECTION
         value: pgsql
 
-envGroups:
+envVarGroups: # Corrected field name
   - name: veritas-shared-secrets
     envVars:
       - key: DB_HOST
