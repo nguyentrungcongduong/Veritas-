@@ -2,10 +2,9 @@ services:
   # 1. Backend Service (Laravel)
   - type: web
     name: veritas-backend
-    env: docker
+    runtime: docker # Changed from env to runtime
     dockerContext: backend
     dockerfilePath: Dockerfile.render
-    plan: free # adjust as needed
     envVars:
       - fromGroup: veritas-shared-secrets
       - key: APP_ENV
@@ -20,11 +19,10 @@ services:
   # 2. Worker Service (Queues)
   - type: worker
     name: veritas-worker
-    env: docker
+    runtime: docker # Changed from env to runtime
     dockerContext: backend
     dockerfilePath: Dockerfile.render
     dockerCommand: "php artisan queue:work --tries=3"
-    plan: free # adjust as needed
     envVars:
       - fromGroup: veritas-shared-secrets
       - key: APP_ENV
@@ -38,7 +36,7 @@ envGroups:
       - key: DB_HOST
         sync: false
       - key: DB_PORT
-        value: 5432
+        value: "5432" # Use string
       - key: DB_DATABASE
         sync: false
       - key: DB_USERNAME
