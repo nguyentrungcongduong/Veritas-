@@ -38,5 +38,5 @@ RUN chmod -R 775 storage bootstrap/cache
 # Fix port cho Render
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# Lệnh khởi chạy và tự động chạy Migration
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT}
+# Lệnh khởi chạy: Migration + Seed + Serve
+CMD php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=${PORT}
