@@ -24,10 +24,8 @@ class CasesByStarRatingSeeder extends Seeder
         DB::statement('DELETE FROM cases');
         DB::table('users')->where('email', 'mastermind@veritas.test')->delete();
 
-        // Create Mastermind user
-        $mastermindId = (string) Str::uuid();
-        DB::table('users')->insert([
-            'id' => $mastermindId,
+        // Create Mastermind user (auto-increment ID)
+        $mastermindId = DB::table('users')->insertGetId([
             'name' => 'Mastermind_X',
             'email' => 'mastermind@veritas.test',
             'password' => bcrypt('password'),
@@ -117,9 +115,7 @@ class CasesByStarRatingSeeder extends Seeder
 
         // 3. Insert Statements
         foreach ($data['statements'] as $st) {
-            $stId = (string) Str::uuid();
-            DB::table('statements')->insert([
-                'id' => $stId,
+            $stId = DB::table('statements')->insertGetId([
                 'suspect_id' => $suspectMap[$st['suspect_temp_id']],
                 'content' => $st['content'],
                 'type' => $st['type'],
@@ -133,9 +129,7 @@ class CasesByStarRatingSeeder extends Seeder
 
         // 4. Insert Clues
         foreach ($data['clues'] as $c) {
-            $cId = (string) Str::uuid();
-            DB::table('clues')->insert([
-                'id' => $cId,
+            $cId = DB::table('clues')->insertGetId([
                 'case_id' => $caseId,
                 'name' => $c['name'],
                 'description' => $c['description'],
@@ -151,7 +145,6 @@ class CasesByStarRatingSeeder extends Seeder
         // 5. Insert Contradictions
         foreach ($data['contradictions'] as $con) {
             DB::table('contradictions')->insert([
-                'id' => (string) Str::uuid(),
                 'case_id' => $caseId,
                 'statement_id' => $statementMap[$con['statement_temp_id']],
                 'clue_id' => isset($con['clue_temp_id']) ? $clueMap[$con['clue_temp_id']] : null,
