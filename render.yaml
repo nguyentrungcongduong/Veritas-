@@ -6,33 +6,29 @@ services:
     dockerContext: backend
     dockerfilePath: backend/Dockerfile.render
     envVars:
-      - fromGroup: veritas-shared-secrets
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: true # Bật lên để xem lỗi 500 là gì
+        value: true # Tui để true để mình còn thấy lỗi mà fix nhen!
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_SSLMODE
-        value: require # Bắt buộc phải có cái này cho Neon
+        value: require # Neon cần cái này
       - key: CORS_ALLOWED_ORIGINS
         value: "*"
-
-envVarGroups:
-  - name: veritas-shared-secrets
-    envVars:
+      # Các biến này sẽ lấy từ Dashboard bạn đã điền:
       - key: DB_HOST
-        sync: false
+        sync: true
       - key: DB_PORT
         value: "5432"
       - key: DB_DATABASE
-        sync: false
+        sync: true
       - key: DB_USERNAME
-        sync: false
+        sync: true
       - key: DB_PASSWORD
-        sync: false
+        sync: true
       - key: APP_KEY
-        sync: false # Bạn điền tay cái base64 tui gửi vào Dashboard nhé
+        sync: true
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
