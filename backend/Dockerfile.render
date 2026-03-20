@@ -1,6 +1,6 @@
 FROM php:8.3-apache
 
-# Install system dependencies
+# Cài đặt các thư viện hệ thống
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,39 +10,28 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libpq-dev \
-    libzip-dev
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# Cài đặt PHP extensions (Quan trọng nhất là pdo_pgsql)
+RUN docker-php-ext-install pdo_pgsql pgsql mbstring zip exif pcntl bcmath gd
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd zip
-
-# Enable Apache mod_rewrite
+# Kích hoạt mod_rewrite của Apache
 RUN a2enmod rewrite
 
-# Set DocumentRoot to /var/www/html/public
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-# Set working directory
+# Setup thư mục làm việc
 WORKDIR /var/www/html
-
-# Copy application files
 COPY . .
 
-# Install Composer
+# Cài đặt Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Clear project caches and install dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Set permissions
+# Phân quyền cho Laravel
 RUN chown -R www-data:www-data storage bootstrap/cache
+RUN chmod -R 775 storage bootstrap/cache
 
-# Expose port (Render uses $PORT, Apache uses 80 by default)
-EXPOSE 80
+# Fix port cho Render
+RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
-# Start Apache
-CMD ["apache2-foreground"]
+# Lệnh khởi chạy và tự động chạy Migration
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT}
