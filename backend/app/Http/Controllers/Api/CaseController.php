@@ -15,8 +15,16 @@ class CaseController extends Controller
     // ────────────────────────────────────────────────────────────────
     public function index(Request $request)
     {
-        $cases = DetectiveCase::where('status', 'published')
-            ->with('author:id,name')                // Chỉ lấy id + name, không lấy password/email
+        $query = DetectiveCase::where('status', 'published');
+
+        if ($request->has('min_difficulty')) {
+            $query->where('difficulty', '>=', $request->integer('min_difficulty'));
+        }
+        if ($request->has('max_difficulty')) {
+            $query->where('difficulty', '<=', $request->integer('max_difficulty'));
+        }
+
+        $cases = $query->with('author:id,name')                // Chỉ lấy id + name, không lấy password/email
             ->select([
                 'id',
                 'title',

@@ -12,6 +12,7 @@ use App\Models\Investigation;
 use App\Services\DiscoveryService;
 use App\Services\FameService;
 use App\Services\JudgmentService;
+use App\Services\WatsonService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -21,6 +22,7 @@ class InvestigationController extends Controller
         private readonly JudgmentService  $judgmentService,
         private readonly FameService      $fameService,
         private readonly DiscoveryService $discoveryService,
+        private readonly WatsonService    $watsonService,
     ) {}
 
     // ────────────────────────────────────────────────────────────────
@@ -321,6 +323,29 @@ class InvestigationController extends Controller
             ],
             'criminal_gloat'  => $gloat,
         ]);
+    }
+
+    /**
+     * POST /api/v1/investigations/{case_id}/watson
+     * Ask Watson for a hint.
+     */
+    public function watson(Request $request, string $caseId): JsonResponse
+    {
+        $validated = $request->validate([
+            'tier' => ['required', 'integer', 'min:1', 'max:2'],
+        ]);
+
+        $investigation = Investigation::where('case_id', $caseId)
+            ->where('user_id', auth('sanctum')->id())
+            ->firstOrFail();
+
+        if ($investigation->isExhausted() || $investigation->isSolved()) {
+            return response()->json(['message' => 'Investigation is over.'], 403);
+        }
+
+        $hint = $this->watsonService->getHint($investigation, $validated['tier']);
+
+        return response()->json($hint);
     }
 }
 

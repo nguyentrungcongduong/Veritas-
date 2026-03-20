@@ -1,0 +1,47 @@
+services:
+  # 1. Backend Service (Laravel)
+  - type: web
+    name: veritas-backend
+    env: php
+    rootDir: backend
+    buildCommand: "composer install --no-dev --optimize-autoloader && php artisan migrate --force && php artisan config:cache && php artisan route:cache"
+    startCommand: "apache2-foreground" # Render's standard PHP start
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DOCUMENT_ROOT
+        value: public # Crucial for Laravel on Render
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 5432
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: APP_KEY
+        generateValue: true
+      - key: SESSION_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+
+  # 2. Worker Service (Queues)
+  - type: worker
+    name: veritas-worker
+    env: php
+    rootDir: backend
+    buildCommand: "composer install --no-dev --optimize-autoloader"
+    startCommand: "php artisan queue:work --tries=3"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DB_CONNECTION
+        value: pgsql
+      # ... Same DB env vars as above

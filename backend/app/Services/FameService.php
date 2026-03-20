@@ -23,6 +23,10 @@ class FameService
         5 => 5.0,
     ];
 
+    // Khấu trừ điểm khi dùng bảo bối (Gadget Penalties)
+    private const GADGET_ACCURACY_PENALTY = 0.20; // -20% mỗi lần dùng đồ chơi
+    private const VOICE_CHANGER_PENALTY = 0.50;   // -50% nếu dùng máy giả giọng (auto-solve 1 suspect)
+
     /**
      * Thưởng Fame khi phá án thành công.
      *
@@ -35,6 +39,19 @@ class FameService
     {
         $multiplier = self::DIFFICULTY_MULTIPLIER[$difficulty] ?? 1.0;
 
+        // Tính toán Penalty từ bảo bối (Gadgets)
+        // Giả sử gadget usage được lưu trong discovered_clues['gadgets_used']
+        $gadgetsUsed = $investigation->discovered_clues['gadgets_used'] ?? [];
+        $gadgetPenaltyMultiplier = 1.0 - (count($gadgetsUsed) * self::GADGET_ACCURACY_PENALTY);
+        
+        // Cú chốt: Nếu dùng Voice Changer thì bị chia đôi Fame
+        if (in_array('voice_changer', $gadgetsUsed)) {
+            $gadgetPenaltyMultiplier *= self::VOICE_CHANGER_PENALTY;
+        }
+
+        // Đảm bảo multiplier không âm
+        $gadgetPenaltyMultiplier = max(0.1, $gadgetPenaltyMultiplier);
+
         // Bonus khi còn nhiều attempts: 3 → x1.5, 2 → x1.2, 1 → x1.0
         $attemptBonus = match ($investigation->attempts_left) {
             3 => 1.5,
@@ -42,7 +59,7 @@ class FameService
             default => 1.0,
         };
 
-        $fameEarned = (int) round($baseScore * $multiplier * $attemptBonus);
+        $fameEarned = (int) round($baseScore * $multiplier * $attemptBonus * $gadgetPenaltyMultiplier);
 
         $investigation->update([
             'status'      => 'solved',
@@ -58,8 +75,16 @@ class FameService
             $user->save();
         }
 
-        // Penalty cho Criminal (tạm đơn giản: không cộng prestige nếu solve ngay trong lượt đầu)
-        // Creator prestige logic sẽ nằm ở bên ngoài hoặc khi criminal check.
+        // Mastermind Bonus: Nếu thám tử phải dùng bảo bối, tội phạm nhận được 20 prestige/món
+        if (!empty($gadgetsUsed)) {
+            $case = $investigation->case;
+            if ($case && $case->author_id) {
+                $author = \App\Models\User::find($case->author_id);
+                if ($author) {
+                    $author->increment('prestige', count($gadgetsUsed) * 20);
+                }
+            }
+        }
 
         return $fameEarned;
     }

@@ -8,6 +8,8 @@ import { useUserStore } from '@/store/useUserStore';
 import { useState } from 'react';
 import TransitionOverlay from '@/components/TransitionOverlay';
 import NotificationBell from '@/components/NotificationBell';
+import ModeSelectionCabinet from '@/components/ModeSelectionCabinet';
+import FlashMysteryCard from '@/components/FlashMysteryCard';
 
 interface TrendingCase {
   id: string;
@@ -233,10 +235,39 @@ export default function HomePage() {
                 PLAN A HEIST
               </button>
 
-              <div style={{ position: 'absolute', bottom: '16px', left: '48px', fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'rgba(242,240,233,0.2)', display: 'flex', gap: '16px', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
-                <span>alibi</span><span>deception</span><span>misdirection</span><span>shadows</span>
-              </div>
             </div>
+          </div>
+
+          {/* ── Mode Selection Cabinet ─────────────────────────────────── */}
+          <div style={{
+            padding: '64px 24px',
+            backgroundColor: 'var(--paper-dark)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            borderBottom: '3px solid var(--charcoal)',
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'0.03\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E")'
+          }}>
+            <h2 style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              letterSpacing: '0.4em',
+              marginBottom: '32px',
+              color: 'var(--red)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px'
+            }}>
+              <span style={{ width: '40px', height: '1px', backgroundColor: 'currentColor opacity 0.3' }}></span>
+              CLASSIFIED DOSSIER SELECTION
+              <span style={{ width: '40px', height: '1px', backgroundColor: 'currentColor opacity 0.3' }}></span>
+            </h2>
+            <ModeSelectionCabinet />
+            <p style={{ marginTop: '24px', fontFamily: 'var(--font-mono)', fontSize: '10px', color: '#666', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              * ACCESSING ACADEMY IS RECOMMENDED FOR NEW RECRUITS. [ RANK REQUIREMENT FOR RED FILE: 5 ]
+            </p>
           </div>
 
           {/* ── Global Stats ─────────────────────────────────────── */}
@@ -475,6 +506,24 @@ export default function HomePage() {
                     <div>Reward: <span style={{ color: 'var(--red-bright)', fontWeight: 'bold' }}>+500 FAME</span></div>
                     <div style={{ color: 'var(--red-bright)' }}>Expires in 14h 22m</div>
                   </div>
+                </div>
+
+                <div style={{ width: '100%', height: '1px', borderTop: '1px dashed rgba(26,26,26,0.5)', marginBottom: '32px' }} />
+
+                <h2
+                  style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}
+                  onClick={() => router.push('/flash-mystery')}
+                >
+                  <span style={{ color: 'var(--blue-logic)' }}>⚡</span> FLASH MYSTERY (VIEW ALL)
+                </h2>
+                <div style={{ transform: 'scale(0.85)', transformOrigin: 'top left', marginBottom: '32px' }}>
+                  <FlashMysteryCard
+                    caseTitle="The Melting Alibi"
+                    description="A man claims he was in his apartment drinking iced coffee during the heavy blizzard. But the scene photo taken 5 minutes after the crime shows his cup is completely dry."
+                    options={["He used fake ice cubes", "The heater was on too high", "There was no blizzard"]}
+                    correctIndex={0}
+                    onResult={(res) => console.log('Flash result:', res)}
+                  />
                 </div>
 
                 <div style={{ width: '100%', height: '1px', borderTop: '1px dashed rgba(26,26,26,0.5)', marginBottom: '24px' }} />

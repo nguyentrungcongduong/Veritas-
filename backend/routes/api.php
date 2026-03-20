@@ -37,6 +37,7 @@ Route::prefix('v1')->group(function () {
     // Auth-only endpoints
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/cases/{case_id}/accuse', [InvestigationController::class, 'accuse']);
+        Route::post('/cases/{case_id}/watson', [InvestigationController::class, 'watson']);
         Route::get('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'show']);
     });
 
@@ -66,4 +67,10 @@ Route::prefix('v1')->group(function () {
     Route::post('/planner/{uuid}/validate',          [PlannerController::class, 'validate']);
     Route::post('/planner/{uuid}/self-solve',        [PlannerController::class, 'selfSolve']);
     Route::post('/planner/{uuid}/publish',           [PlannerController::class, 'publish']);
+
+    // Flash Cases (Viral UGC)
+    Route::get('/flash-cases', [\App\Http\Controllers\Api\FlashCaseController::class, 'index']);
+    Route::get('/flash-cases/{id}', [\App\Http\Controllers\Api\FlashCaseController::class, 'show']);
+    Route::post('/flash-cases/{id}/solve', [\App\Http\Controllers\Api\FlashCaseController::class, 'solve']);
+    Route::middleware('auth:sanctum')->post('/flash-cases', [\App\Http\Controllers\Api\FlashCaseController::class, 'store']);
 });
