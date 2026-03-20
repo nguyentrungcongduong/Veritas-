@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
+    postgresql-client \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Cấu hình và cài đặt PHP extensions
