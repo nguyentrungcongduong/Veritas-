@@ -15,6 +15,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Seed 15 cases organized by star rating (3 cases per difficulty level)
+        $this->call(CasesByStarRatingSeeder::class);
+        
+        // Original seeder code below
         DB::statement('DELETE FROM contradictions');
         DB::statement('DELETE FROM statements');
         DB::statement('DELETE FROM clues');
@@ -207,5 +211,8 @@ class DatabaseSeeder extends Seeder
         $this->command->info("╠═══════════════════════════════════════════╣");
         $this->command->info("║ Culprit   : {$thuQuy->id}");
         $this->command->info("╚═══════════════════════════════════════════╝");
+
+        // ── Seed thêm 5 vụ án khác từ The Mastermind Collection ──────
+        $this->call(MastermindCollectionSeeder::class);
     }
 }
